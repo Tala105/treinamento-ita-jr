@@ -17,13 +17,14 @@ for i in range (0,15):
     biscoito.click()
 
 while 1:
-    qtd=int(str.split(browser.find_element(By.ID,"cookies").text)[0])
+    qtd=int(str.split(browser.find_element(By.ID,"cookies").text.replace(',', ''))[0])
     upgrades=melhorias.find_elements(By.CLASS_NAME,"crate.upgrade.enabled")
     if len(upgrades):
         upgrades[0].click()
     autos=produtos.find_elements(By.CLASS_NAME,"product.unlocked.enabled")
+    autos.reverse()
     browser.implicitly_wait(0)
     for auto in autos:
-        if qtd>int(str.split(auto.text)[1]):
+        if qtd>int(str.split(auto.text.replace(',', ''))[1]):
             auto.click()
     biscoito.click()
