@@ -4,141 +4,172 @@ import subprocess
 import sys
 from time import sleep
 
+
+class carta:
+    def __init__(self, valor, naipe):
+        self.simb = valor
+        
+        if naipe != "hidden":
+            if valor == 'A':
+                self.valor = 11
+            elif valor == 'J' or valor == 'Q' or valor == 'K':
+                self.valor = 10
+            else:
+                self.valor = int(valor)
+        else:
+            self.valor = 0
+        self.naipe = naipe
+        
+        
+        self.visu0 = " ____"
+        
+        if naipe != "hidden":
+            self.visu1 = f"|{naipe}  |"
+        else:
+            self.visu1 = "|\\\\\\|"
+            
+        if naipe != "hidden" and valor != '10':
+            self.visu2 = f"| {valor} |"   
+        elif naipe != "hidden":
+            self.visu2 = f"| {valor}|"
+        else:
+            self.visu2 = "|\\\\\\|"
+            
+        if naipe != "hidden":
+            self.visu3 = f"|  {naipe}|"
+        else:
+            self.visu3 = "|\\\\\\|"
+            
+        self.visu4 = " \u203e\u203e\u203e\u203e"
+        
 def baralho():
-    v=0
     cards=[]
-    valor=["A",2,3,4,5,6,7,8,9,10,"J","Q","K"]
-    suit=["♥","♠","♣","♦"]
-    while v<4:
-        n=0
-        while  n<13:
-            cards.append(str(valor[n]) + " " + suit[v])
-            n+=1
-        v+=1
+    valor=['A','2','3','4','5','6','7','8','9','10','J','Q','K']
+    naipe=['♥',"♠","♣","♦"]
+    v=0
+    
+    while v <= 12:
+        n = 0
+        while  n <= 3:
+            card = carta(valor = valor[v], naipe = naipe[n])
+            cards.append(card)
+            n += 1
+        v += 1
         
     shuffle(cards)
     return cards
 
-def Visual(proxcarta,layer0,layer1,layer2,layer3,layer4):
-    if proxcarta[0]!="10":
-        layer0.append(" ___ ")
-        layer1.append(f"|{proxcarta[1]}  |")
-        layer2.append(f"| {proxcarta[0]} |")
-        layer3.append(f"|  {proxcarta[1]}|")
-        layer4.append(" \u203e\u203e\u203e ")
-    else:
-        layer0.append(" ___ ")
-        layer1.append(f"|{proxcarta[1]}  |")
-        layer2.append(f"| {proxcarta[0]}|")
-        layer3.append(f"|  {proxcarta[1]}|")
-        layer4.append(" \u203e\u203e\u203e ")
+class mão:
+    def __init__(self, pontos, cartas):
+        self.pontos = pontos
+        self.cartas = cartas
+        self.count = 0
+        
+    def new(self,carta):
+        self.cartas.append(carta)
+        self.pontos += carta.valor
+        if carta.simb == "A":
+            self.count += 1
+        
+    def clear(self):
+        self.cartas = []
+        self.pontos = 0
 
-def printV(visu):
-    n=0
-    while len(visu)-n:
-        print(visu[n],end="")
-        n+=1
-    print("")
 def cardprint(jogador):
-    printV(jogador.layer0)
-    printV(jogador.layer1)
-    printV(jogador.layer2)
-    printV(jogador.layer3)
-    printV(jogador.layer4)
+    for carta in jogador.cartas:
+        print(carta.visu0, end = " ")
+    print()
+    for carta in jogador.cartas:
+        print(carta.visu1, end = " ")
+    print()
+    for carta in jogador.cartas:
+        print(carta.visu2, end = " ")
+    print()
+    for carta in jogador.cartas:
+        print(carta.visu3, end = " ")
+    print()
+    for carta in jogador.cartas:
+        print(carta.visu4, end = " ")
     
-sd=dict({'A':11,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':10,'Q':10,'K': 10}) 
+cartavazia = carta(naipe = "hidden", valor = 0)
+
+print("Escreva ""hit"" para receber outra carta e qualquer outra coisa para parar\n Aperte ""Enter"" botão para continuar:")
+input()
+os.system("cls")
 
 repeat="Y"   
-while repeat == "Y":
-    class player:
-        layer0=[]
-        layer1=[]
-        layer2=[]
-        layer3=[]
-        layer4=[]
-        points=0
-    
-    class dealer:
-        layer0=[" ___ "]
-        layer1=["|\\\\\\|"]
-        layer2=["|\\\\\\|"]
-        layer3=["|\\\\\\|"]
-        layer4=[" \u203e\u203e\u203e "]
-        points=0
-    
-    os.system('cls')  
-    count=0
-    i=0
+while repeat.upper() == "Y":
+    cartas = baralho()
+    player = mão(pontos = 0, cartas = [])
+    dealer = mão(pontos = 0, cartas = [])
+    dealer.new(carta = cartavazia)
+    proxcarta = cartas[0]
+    player.new(proxcarta)
+        
+    os.system('cls')
+    player.count = 0
+    i=1
     confirm="hit"
-    cartas=baralho()
-
+    
     proxcarta=cartas[i]
     i+=1
-    proxcarta=proxcarta.split(" ")
-    dealer.points+=sd[proxcarta[0]]
-    Visual(proxcarta,dealer.layer0,dealer.layer1,dealer.layer2,dealer.layer3,dealer.layer4)
-
-    while confirm=="hit":
+    dealer.new(proxcarta)
+    
+    while confirm.lower() == "hit":
         cardprint(dealer)
-        print(f"Dealer's points: {dealer.points}")
+        print(f"Dealer's pontos: {dealer.pontos}")
         print("DEALER'S CARDS")
-        
         print("YOUR CARDS")
-        proxcarta=cartas[i]
+        
+        proxcarta = cartas[i]
         i+=1
-        proxcarta=proxcarta.split(" ")
-        if proxcarta[0]=="A":
-            count+=1
-        print(count)
-        player.points+=sd[proxcarta[0]]
-        Visual(proxcarta,player.layer0,player.layer1,player.layer2,player.layer3,player.layer4)
+        player.new(proxcarta)
         cardprint(player)
-                
-        if player.points>21 and player.points-10*count<=21: 
-           while player.points>21:
-                player.points-=10
-                count-=1  
+        print()
+    
+        if player.pontos > 21 and player.pontos-10*player.count <=21: 
+           while player.pontos > 21:
+                player.pontos -= 10
+                player.count -= 1  
             
-        elif player.points>21:
-            print(f"Your points: {player.points}\nBUST")
+        elif player.pontos>21:
+            print(f"Your pontos: {player.pontos}\nBUST")
             print("\nPlay Again?(Y/N)")
-            repeat=input()
-            if repeat=="Y":
+            repeat = input().lower().strip()[0]
+            if repeat=="y":
                 subprocess.call([sys.executable, os.path.realpath(__file__)] + sys.argv[1:])
+
             else:
                 sys.exit()
-        print(f"Your points: {player.points}")
+        print(f"Your pontos: {player.pontos}")
         confirm=input()
         os.system("cls")
-            
-    dealer.layer0=[]
-    dealer.layer1=[]
-    dealer.layer2=[]
-    dealer.layer3=[]
-    dealer.layer4=[]
-    Visual(cartas[0].split(),dealer.layer0,dealer.layer1,dealer.layer2,dealer.layer3,dealer.layer4)
         
-    while (dealer.points<17 and confirm!="hit") or dealer.points<player.points:
+    dealer.cartas = [dealer.cartas[1]]
+    while (dealer.pontos<22 and confirm!="hit") or dealer.pontos < player.pontos:
         proxcarta=cartas[i]
         i+=1
-        proxcarta=proxcarta.split(" ")
-        dealer.points+=sd[proxcarta[0]]
-        Visual(proxcarta,dealer.layer0,dealer.layer1,dealer.layer2,dealer.layer3,dealer.layer4)
+        dealer.new(proxcarta)
         cardprint(dealer)
-        print(f"Dealer's points: {dealer.points}")
+        print()
+        if dealer.pontos > 21 and dealer.count > 0:
+            while dealer.pontos > 21:
+                dealer.pontos -= 10
+                dealer.count -= 1  
+                
+        print(f"Dealer's pontos: {dealer.pontos}")
         print("DEALER'S CARDS")
-        
         cardprint(player)
-        print(f"Your points: {player.points}\n")
-        if dealer.points<17 or dealer.points<player.points:
+        print(f"Your pontos: {player.pontos}\n")
+        
+        if dealer.pontos < 21 or dealer.pontos < player.pontos:
             sleep(1)
             os.system('cls')    
 
-    if player.points>dealer.points or dealer.points>21:
+    if player.pontos > dealer.pontos or dealer.pontos > 21:
         print("YOU WIN")
-    elif player.points==dealer.points:
-        print("DRAW")
+        
     else:
         print("YOU LOSE")
     print("\nPlay Again?(Y/N)")
-    repeat=input()
+    repeat = input().strip().lower()

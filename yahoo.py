@@ -13,7 +13,7 @@ lista = []
 options = Options()
 options.add_argument("--headless")
 
-browser = webdriver.Chrome(options = options)
+browser = webdriver.Chrome("C:\Program Files (x86)\chromedriver.exe",options = options)
 action=ActionChains(browser)
 browser.get('https://br.financas.yahoo.com/screener/predefined/most_shorted_stocks')
 
@@ -61,5 +61,5 @@ for linha in linhas:
         lista.append([nome.text,sigla.text,porcentagem.text, nominal.text,volume.text,valor.text])
 
 stocks = pd.DataFrame(lista, columns=['Nome', 'Sigla', 'Variação em %', 'Variação Nominal', 'Volume', 'Valor de mercado'])
-stocks.to_excel('stocks.xlsx', index = False)
-print(stocks)
+stocks.to_excel('stocks.xlsx')
+print("1")
