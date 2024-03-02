@@ -20,7 +20,6 @@ class carta:
             self.valor = 0
         self.naipe = naipe
         
-        
         self.visu0 = " ____"
         
         if naipe != "hidden":

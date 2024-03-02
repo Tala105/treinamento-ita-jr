@@ -4,6 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from time import sleep
 import pandas as pd
@@ -13,8 +15,10 @@ lista = []
 options = Options()
 options.add_argument("--headless")
 
-browser = webdriver.Chrome("C:\Program Files (x86)\chromedriver.exe",options = options)
-action=ActionChains(browser)
+webdriver_service = Service(ChromeDriverManager().install())
+
+browser = webdriver.Chrome(service=webdriver_service, options=options)
+action = ActionChains(browser)
 browser.get('https://br.financas.yahoo.com/screener/predefined/most_shorted_stocks')
 
 WebDriverWait(browser, 10).until(EC.frame_to_be_available_and_switch_to_it(browser.find_element(By.ID, "guce-inline-consent-iframe")))
@@ -61,5 +65,5 @@ for linha in linhas:
         lista.append([nome.text,sigla.text,porcentagem.text, nominal.text,volume.text,valor.text])
 
 stocks = pd.DataFrame(lista, columns=['Nome', 'Sigla', 'Variação em %', 'Variação Nominal', 'Volume', 'Valor de mercado'])
-stocks.to_excel('stocks.xlsx')
+stocks.to_excel('stocks.xlsx', index=False)
 print("1")
